@@ -4,29 +4,16 @@ A machine learning project that builds a price prediction model for Airbnb listi
 
 ---
 
-## Table of Contents
-
-- [Overview](#overview)
-- [Dataset](#dataset)
-- [Project Structure](#project-structure)
-- [Methodology](#methodology)
-- [Models](#models)
-- [Results](#results)
-- [Requirements](#requirements)
-- [Usage](#usage)
-
----
-
 ## Overview
 
 This project develops a reliable model for predicting optimal Airbnb listing prices in Melbourne, providing data-driven price insights to multiple stakeholders:
 
-- **Hosts** — set competitive yet profitable rates
-- **Guests** — assess whether a listing is fairly priced
-- **Property Investors** — evaluate location and property attributes
-- **Financial Institutions** — incorporate price predictions into risk assessments
+- **Hosts**: set competitive yet profitable rates
+- **Guests**: assess whether a listing is fairly priced
+- **Property Investors**: evaluate location and property attributes
+- **Financial Institutions**: incorporate price predictions into risk assessments
 
-**Evaluation Metric:** Mean Absolute Error (MAE) — chosen for its interpretability and robustness to outliers in a right-skewed price distribution.
+**Evaluation Metric:** Mean Absolute Error (MAE) is chosen for its interpretability and robustness to outliers in a right-skewed price distribution.
 
 ---
 
@@ -34,7 +21,7 @@ This project develops a reliable model for predicting optimal Airbnb listing pri
 
 The dataset contains Airbnb listing records split into training and test sets, loaded from `train.csv` and `test.csv`. Both sets are combined before preprocessing to ensure consistent transformations.
 
-**Target Variable:** `price` — nightly listing price in AUD (log-transformed as `log_price` during modelling)
+**Target Variable:** `price` - listing price in AUD (log-transformed as `log_price` during modelling)
 
 ### Feature Summary
 
@@ -66,7 +53,7 @@ The dataset contains Airbnb listing records split into training and test sets, l
 ### 1. Exploratory Data Analysis
 - Examined feature types and distributions; identified price as right-skewed with a median of $172 and outliers exceeding $100K
 - Applied 1st–99th percentile clipping followed by `np.log1p` transformation to stabilise the target variable
-- Visualised missing values across train/test sets using stacked bar charts
+- Visualized missing values across train/test sets using stacked bar charts
 
 ### 2. Data Cleaning
 - Stripped `$` from `price` and `%` from `host_response_rate` / `host_acceptance_rate`, then cast to float
@@ -131,18 +118,17 @@ All models were hyperparameter-tuned using **RandomizedSearchCV** with:
 
 ## Results
 
+<img width="668" height="414" alt="image" src="https://github.com/user-attachments/assets/9aace7a5-880a-4b32-9a27-10844ff98963" />
+
 ### Individual Regressors
 
-| Model | MAE Train | MAE Test |
-|---|---|---|
-| LightGBM | — | ~57–58 |
-| GBM | — | ~57–58 |
-| Random Forest | — | ~57–58 |
-| XGBoost | — | ~58 |
-| SVR | 64.39 | 51.97* |
-| Lasso / Ridge / LR | — | High (underfitting) |
-
 *SVR's lower test MAE is attributed to underfitting on a favourable test split rather than true generalisation.
+All models showed distinct optimal configurations. 
+- Linear models favored high PCA retention with moderate-to-low regularization. 
+- Tree-based models like RF, GBM, and XGBoost benefited from deep trees and large estimator counts while boosting models had low learning rates.
+- SVR and LightGBM required balancing of complexity and regularization. 
+
+Overall, these hyperparameters show that simpler models benefited from regularization and dimensionality reduction, while complex models required finely tuned learning controls. This tuning process shall now form as the foundation of our ensemble modeling.
 
 ### Ensemble Models
 
