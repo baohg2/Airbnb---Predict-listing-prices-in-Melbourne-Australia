@@ -92,6 +92,7 @@ Price distribution analysis (raw and log-scale), univariate profiling of capacit
 - Hyperparameters optimised via `RandomizedSearchCV` with 10-fold cross-validation and `n_iter=40`, scored on negative MAE.
 
 **Stage 4: Ensemble Methods & Final Prediction**
+
 Comparison between 4 ensemble models: Stacking and Voting with top-5 and all-model variants. Final predictions generated on the test set, converted from log-scale back to dollar scale.
 
 ---
