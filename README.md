@@ -69,7 +69,9 @@ pip install pandas numpy scikit-learn xgboost lightgbm textblob contextily
 The project follows a structured end-to-end machine learning workflow across four stages.
 
 **Stage 1: Exploratory Data Analysis** (before and after Step 2)
+
 Price distribution analysis (raw and log-scale), univariate profiling of capacity features, missing value assessment across train/test splits, and geospatial mapping of listing prices across Melbourne suburbs.
+
 ![Airbnb---Predict-listing-prices-in-Melbourne-Australia](Photo/map.png)
 
 **Stage 2: Data Cleaning, Transformation & Feature Engineering**
