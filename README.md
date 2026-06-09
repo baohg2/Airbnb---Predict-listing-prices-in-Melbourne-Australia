@@ -29,6 +29,7 @@ The dataset contains Airbnb listing records for Melbourne, Australia, sourced fr
 | **Features** | ~100 (35 numeric, 16 nominal, 1 ordinal, 3 date, 2 geo, 3 text) |
 | **Evaluation Metric** | Mean Absolute Error (MAE) on log-transformed price |
 
+![Airbnb---Predict-listing-prices-in-Melbourne-Australia](Photo/map.png)
 ---
 
 ## 🚀 Getting Started
