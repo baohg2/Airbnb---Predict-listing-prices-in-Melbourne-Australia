@@ -29,7 +29,6 @@ The dataset contains Airbnb listing records for Melbourne, Australia, sourced fr
 | **Features** | ~100 (35 numeric, 16 nominal, 1 ordinal, 3 date, 2 geo, 3 text) |
 | **Evaluation Metric** | Mean Absolute Error (MAE) on log-transformed price |
 
-![Airbnb---Predict-listing-prices-in-Melbourne-Australia](Photo/map.png)
 ---
 
 ## 🚀 Getting Started
@@ -68,24 +67,29 @@ pip install pandas numpy scikit-learn xgboost lightgbm textblob contextily
 
 The project follows a structured end-to-end machine learning workflow across four stages.
 
-**Stage 1: Exploratory Data Analysis**
+**Stage 1: Exploratory Data Analysis** (before and after Step 2)
 Price distribution analysis (raw and log-scale), univariate profiling of capacity features, missing value assessment across train/test splits, and geospatial mapping of listing prices across Melbourne suburbs.
+![Airbnb---Predict-listing-prices-in-Melbourne-Australia](Photo/map.png)
 
 **Stage 2: Data Cleaning, Transformation & Feature Engineering**
-Cleaning of price (`$`), rates (`%`), and textual bathroom fields. Ordinal encoding of `host_response_time`. Grouped nominal encoding for high-cardinality features. Date features converted to time-since metrics. Key engineered features include:
-- `cbd_distance_km` — Haversine distance from Melbourne CBD
-- `min_station_distance_km` — Proximity to nearest train station
-- `room_density` — Guests per room ratio
-- `bed_to_bath_ratio` — Group accommodation indicator
-- `num_amenities` — Count of parsed amenities
-- `description_subjectivity` — TextBlob sentiment score on listing description
-- `days_hosting`, `days_since_first_review` — Host tenure features
+- Cleaning text formatting.
+- Standardizing numerical features using `StandardScaler`.
+- Encoding high-cardinality nominal features using `OneHotEncoder`.
+- Key engineered features include:
+  - `cbd_distance_km`: Haversine distance from Melbourne CBD
+  - `min_station_distance_km`: Proximity to nearest train station
+  - `room_density`: Guests per room ratio
+  - `bed_to_bath_ratio`: Group accommodation indicator
+  - `num_amenities`: Count of parsed amenities
+  - `description_subjectivity`: TextBlob sentiment score on listing description
+  - `days_hosting`, `days_since_first_review`: Host related features
 
 **Stage 3: Model Training & Tuning**
-Nine base regressors trained within `sklearn` Pipelines (with `StandardScaler` + `PCA` for linear models). Hyperparameters optimised via `RandomizedSearchCV` with 10-fold cross-validation and `n_iter=40`, scored on negative MAE.
+- Nine base regressors trained within `sklearn` Pipelines (with `StandardScaler` + `PCA` for linear models). 
+- Hyperparameters optimised via `RandomizedSearchCV` with 10-fold cross-validation and `n_iter=40`, scored on negative MAE.
 
 **Stage 4: Ensemble Methods & Final Prediction**
-Four ensemble configurations compared — Stacking and Voting with top-5 and all-model variants. Final predictions generated on the test set, converted from log-scale back to AUD.
+Comparison between 4 ensemble models: Stacking and Voting with top-5 and all-model variants. Final predictions generated on the test set, converted from log-scale back to dollar scale.
 
 ---
 
