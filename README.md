@@ -1,27 +1,52 @@
-# Predicting Airbnb Listing Prices in Melbourne, Australia
+# 🏠 Predicting Airbnb Listing Prices in Melbourne, Australia
+### Machine Learning Project | Price Prediction with Ensemble Methods
 
-A machine learning project that builds a price prediction model for Airbnb listings in Melbourne, using ensemble methods across nine regression models tuned with randomized search cross-validation.
-
----
-
-## Overview
-
-This project develops a reliable model for predicting optimal Airbnb listing prices in Melbourne, providing data-driven price insights to multiple stakeholders:
-
-- **Hosts**: set competitive yet profitable rates
-- **Guests**: assess whether a listing is fairly priced
-- **Property Investors**: evaluate location and property attributes
-- **Financial Institutions**: incorporate price predictions into risk assessments
-
-**Evaluation Metric:** Mean Absolute Error (MAE) is chosen for its interpretability and robustness to outliers in a right-skewed price distribution.
+> A machine learning project that develops a reliable price prediction model for Melbourne Airbnb listings, combining extensive feature engineering with stacking and voting ensemble methods to deliver competitive pricing insights.
 
 ---
 
-## Dataset
+## 🔎 Overview
 
-The dataset contains Airbnb listing records split into training and test sets, loaded from `train.csv` and `test.csv`. Both sets are combined before preprocessing to ensure consistent transformations.
+Airbnb hosts in Melbourne often struggle to set optimal prices, with the platform's own suggestions frequently undervaluing listings. This project builds a data-driven pricing engine using structured listing data, engineered geospatial and textual features, and an ensemble of tuned regression models to predict listing prices with high accuracy.
 
-**Target Variable:** `price` - listing price in AUD (log-transformed as `log_price` during modelling)
+**Key questions explored:**
+- What property attributes most strongly predict Airbnb listing price?
+- How does geographic proximity to Melbourne's CBD affect pricing?
+- Can ensemble methods outperform individual regression models?
+- Does log-transforming the target variable improve model performance?
+
+---
+
+## 🗂️ Dataset
+
+The dataset contains Airbnb listing records for Melbourne, Australia, sourced from Inside Airbnb. The combined train and test set spans approximately 6,000 observations and ~100 features covering property details, host attributes, availability, reviews, amenities, and geolocation.
+
+| Item | Detail |
+|---|---|
+| **Source** | Inside Airbnb (Melbourne) |
+| **Target Variable** | `price` (AUD per night) |
+| **Observations** | ~6,000 listings |
+| **Features** | ~100 (35 numeric, 16 nominal, 1 ordinal, 3 date, 2 geo, 3 text) |
+| **Evaluation Metric** | Mean Absolute Error (MAE) on log-transformed price |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+```bash
+pip install pandas numpy scikit-learn xgboost lightgbm textblob contextily
+```
+
+### Running the Notebook
+
+1. Clone this repository and navigate to the project folder.
+2. Place `train.csv` and `test.csv` in the same directory as the notebook.
+3. Open `Predicting_Airbnb_Listing_Price_in_Melbourne.ipynb` in Jupyter or Google Colab.
+4. Run all cells in order. Note that model tuning (`n_iter=40`, `cv=10`) is computationally intensive — a machine with multiple CPU cores is recommended.
+
+---
 
 ### Feature Summary
 
@@ -36,139 +61,104 @@ The dataset contains Airbnb listing records split into training and test sets, l
 
 ---
 
-## Project Structure
+## 📊 Methodology
 
-```
-├── train.csv
-├── test.csv
-├── Predicting_Airbnb_Listing_Price_in_Melbourne.ipynb
-├── prediction_stacking_top_five.csv
-└── README.md
-```
+### Pipeline Overview
 
----
+The project follows a structured end-to-end machine learning workflow across four stages.
 
-## Methodology
+**Stage 1: Exploratory Data Analysis**
+Price distribution analysis (raw and log-scale), univariate profiling of capacity features, missing value assessment across train/test splits, and geospatial mapping of listing prices across Melbourne suburbs.
 
-### 1. Exploratory Data Analysis
-- Examined feature types and distributions; identified price as right-skewed with a median of $172 and outliers exceeding $100K
-- Applied 1st–99th percentile clipping followed by `np.log1p` transformation to stabilise the target variable
-- Visualized missing values across train/test sets using stacked bar charts
+**Stage 2: Data Cleaning, Transformation & Feature Engineering**
+Cleaning of price (`$`), rates (`%`), and textual bathroom fields. Ordinal encoding of `host_response_time`. Grouped nominal encoding for high-cardinality features. Date features converted to time-since metrics. Key engineered features include:
+- `cbd_distance_km` — Haversine distance from Melbourne CBD
+- `min_station_distance_km` — Proximity to nearest train station
+- `room_density` — Guests per room ratio
+- `bed_to_bath_ratio` — Group accommodation indicator
+- `num_amenities` — Count of parsed amenities
+- `description_subjectivity` — TextBlob sentiment score on listing description
+- `days_hosting`, `days_since_first_review` — Host tenure features
 
-### 2. Data Cleaning
-- Stripped `$` from `price` and `%` from `host_response_rate` / `host_acceptance_rate`, then cast to float
-- Parsed the textual `bathrooms` column (e.g. "1.5 baths", "half bath") into numeric values using a custom conversion function
+**Stage 3: Model Training & Tuning**
+Nine base regressors trained within `sklearn` Pipelines (with `StandardScaler` + `PCA` for linear models). Hyperparameters optimised via `RandomizedSearchCV` with 10-fold cross-validation and `n_iter=40`, scored on negative MAE.
 
-### 3. Feature Engineering
-
-| New Feature | Source Column | Transformation |
-|---|---|---|
-| `num_verifications` | `host_verifications` | Count of verification methods per host |
-| `days_hosting` | `host_since` | Days elapsed since host registration |
-| `num_amenities` | `amenities` | Count of amenities listed per property |
-| `region` | `neighbourhood_cleansed` | Mapped suburbs to five Melbourne regions: North, South, East, West, Central |
-
-### 4. Data Imputation
-- **Mean** — normally distributed numerical variables
-- **Median** — skewed numerical variables
-- **Mode** — categorical and ordinal variables
-
-### 5. Encoding & Scaling
-- One-hot encoding for nominal variables
-- Ordinal encoding for `host_response_time`
-- `StandardScaler` + PCA (95% variance retained) applied within pipelines for linear models and SVR
-
-### 6. Train/Test Split
-- 85/15 split with `random_state=42`
+**Stage 4: Ensemble Methods & Final Prediction**
+Four ensemble configurations compared — Stacking and Voting with top-5 and all-model variants. Final predictions generated on the test set, converted from log-scale back to AUD.
 
 ---
 
-## Models
+## 🤖 Models
 
-### Base Regressors (9 models)
+### Base Regressors
 
-All models were hyperparameter-tuned using **RandomizedSearchCV** with:
-- 10-fold cross-validation
-- 40 iterations per model
-- Scoring: negative MAE
-
-| Model | Key Notes |
+| Model | Notes |
 |---|---|
-| Linear Regression | Baseline; no tuning required |
+| Linear Regression | Baseline; PCA-reduced features |
 | Ridge Regression | L2 regularisation; PCA pipeline |
-| Lasso Regression | L1 regularisation; feature selection |
-| Elastic Net | Combined L1 + L2 regularisation |
-| Decision Tree | Tuned depth and leaf parameters |
-| Random Forest | Tuned estimators, depth, and features |
-| Gradient Boosting (GBM) | Tuned learning rate, subsample, depth |
-| XGBoost | Tuned regularisation, gamma, child weight |
-| LightGBM | Tuned leaves, subsample, lambda |
-| SVR | Tuned C, epsilon, kernel; PCA pipeline |
-
-### Ensemble Models (4 variants)
-
-| Ensemble | Description |
-|---|---|
-| Voting (Top 5) | Average predictions from LightGBM, SVR, GBM, Random Forest, XGBoost |
-| Stacking (Top 5) | Same top 5 as base models; Linear Regression as meta-learner |
-| Voting (All) | Average predictions from all 10 base models |
-| Stacking (All) | All 10 base models; Linear Regression as meta-learner |
-
----
-
-## Results
-
-<img width="668" height="414" alt="image" src="https://github.com/user-attachments/assets/9aace7a5-880a-4b32-9a27-10844ff98963" />
-
-### Individual Regressors
-
-*SVR's lower test MAE is attributed to underfitting on a favourable test split rather than true generalisation.
-All models showed distinct optimal configurations. 
-- Linear models favored high PCA retention with moderate-to-low regularization. 
-- Tree-based models like RF, GBM, and XGBoost benefited from deep trees and large estimator counts while boosting models had low learning rates.
-- SVR and LightGBM required balancing of complexity and regularization. 
-
-Overall, these hyperparameters show that simpler models benefited from regularization and dimensionality reduction, while complex models required finely tuned learning controls. This tuning process shall now form as the foundation of our ensemble modeling.
+| Lasso Regression | L1 regularisation; feature selection via sparsity |
+| Elastic Net | L1 + L2 combined regularisation |
+| Decision Tree | Unpruned; tuned depth and leaf parameters |
+| Random Forest | 500–1000 estimators; tuned max depth and features |
+| Gradient Boosting | Sequential boosting; tuned learning rate and subsample |
+| XGBoost | Regularised gradient boosting; tuned gamma and colsample |
+| LightGBM | Leaf-wise boosting; fast and efficient on high-dimensional data |
+| Support Vector Regression | RBF kernel; PCA pipeline |
 
 ### Ensemble Models
 
-Ensemble strategies outperformed all individual regressors. The **Voting Regressor (Top 5)** was selected as the final model due to:
-- Best overall generalisation (lowest average rank across train and test MAE)
-- Stable predictions through equal-weighted averaging of five diverse, well-tuned models
-- Avoidance of noise introduced by weaker linear models in the "all models" variants
+| Ensemble | Base Models | Strategy |
+|---|---|---|
+| Voting (Top 5) | LightGBM, GBM, RF, XGBoost, SVR | Simple average of predictions |
+| Stacking (Top 5) | LightGBM, GBM, RF, XGBoost, SVR | Linear Regression meta-learner |
+| Voting (All) | All 10 regressors | Simple average of predictions |
+| Stacking (All) | All 10 regressors | Linear Regression meta-learner |
 
-### Final Model
-
-> **VotingRegressor** — XGBoost · Gradient Boosting · SVR · LightGBM · Random Forest
-
-Predictions were generated on the log scale and back-transformed using `np.expm1` before submission.
 
 ---
 
-## Requirements
+## 💡 Key Findings
 
-```
-pandas
-numpy
-matplotlib
-seaborn
-scikit-learn
-xgboost
-lightgbm
-shap
-geopandas
-folium
-branca
-contextily
-textblob
-tqdm
-scipy
-```
+| Metric | Value |
+|---|---|
+| Final Model | Stacking Regressor (Top 5) |
+| Best Test MAE (log scale) | ~0.22–0.25 |
+| Strongest individual predictor | `accommodates` (Spearman r = 0.63) |
+| Top ensemble contributor | LightGBM (meta-weight: 0.61) |
+| XGBoost meta-weight | −0.23 (correction term) |
 
-Install all dependencies:
-
-```bash
-pip install pandas numpy matplotlib seaborn scikit-learn xgboost lightgbm shap geopandas folium branca contextily textblob tqdm scipy
-```
+- 🏡 **Capacity drives price**: `accommodates`, `bedrooms`, `beds`, and `bathrooms` are the dominant predictors across all models. Physical scale is the single strongest baseline price signal.
+- 📍 **Location matters**: `cbd_distance_km` and `review_scores_location` consistently appear in top feature importance rankings, confirming that CBD proximity commands a measurable price premium.
+- 🔧 **Engineered features add signal**: `room_density`, `bed_to_bath_ratio`, `description_subjectivity`, and `min_station_distance_km` contribute meaningfully across multiple base models, validating the feature engineering process.
+- 🎯 **Ensemble diversity is a strength**: LightGBM learns from host behaviour and listing presentation; RF, GBM, and XGBoost focus on structural attributes. This divergence is why combining them outperforms any single model.
+- 📉 **Log transformation is essential**: The raw price distribution is extremely right-skewed, compressing ~6,000 observations into a single histogram bar. Log transformation produces a near-normal distribution and substantially improves model performance.
+- ⚠️ **XGBoost acts as a corrector**: The meta-learner assigns XGBoost a negative weight (−0.23), using it to subtract correlated errors from the other base models rather than as a direct contributor.
 
 ---
+
+## 📌 Model Performance Summary
+
+Rankings based on average of MAE_train rank and MAE_test rank across all 14 models (9 base regressors + 4 ensembles + linear regression baseline):
+
+- 🥇 **stacking_top_five** and **stacking_all** tied at average rank 1.5
+- 🥈 Gradient Boosting, LightGBM, and Random Forest led among individual regressors (test MAE ~0.22–0.25)
+- 🔻 Lasso, Ridge, and Linear Regression significantly underfit, confirming the nonlinear complexity of Airbnb pricing
+
+---
+
+## 🛠️ Tools & Technologies
+
+- **Python**: pandas, NumPy, scikit-learn, XGBoost, LightGBM
+- **Geospatial**: Contextily (basemaps), Haversine distance
+- **NLP**: TextBlob (sentiment scoring on listing descriptions)
+- **Modelling**: sklearn Pipelines, RandomizedSearchCV, StackingRegressor, VotingRegressor
+- **Visualisation**: Matplotlib, Seaborn
+
+---
+
+## Author
+Prepared by: Gia Bao Hoang
+
+---
+
+*Dataset sourced from Inside Airbnb (Melbourne). All analyses are conducted for research and educational purposes.*
