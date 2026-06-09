@@ -153,10 +153,10 @@ Rankings based on average of MAE_train rank and MAE_test rank across all 14 mode
 
 ## 🛠️ Tools & Technologies
 
-- **Python**: pandas, NumPy, scikit-learn, XGBoost, LightGBM
+- **Python**: pandas, NumPy, scikit-learn
 - **Geospatial**: Contextily (basemaps), Haversine distance
 - **NLP**: TextBlob (sentiment scoring on listing descriptions)
-- **Modelling**: sklearn Pipelines, RandomizedSearchCV, StackingRegressor, VotingRegressor
+- **Machine Learning Modelling**: sklearn Pipelines, RandomizedSearchCV, StackingRegressor, VotingRegressor
 - **Visualisation**: Matplotlib, Seaborn
 
 ---
