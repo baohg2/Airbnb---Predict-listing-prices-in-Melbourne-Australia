@@ -1,4 +1,4 @@
-# 🏠 Predicting Airbnb Listing Prices in Melbourne, Australia
+# 🏠 Predicting Airbnb Listing Prices in Melbourne
 ### Machine Learning Project | Price Prediction with Ensemble Methods
 
 > A machine learning project that develops a reliable price prediction model for Melbourne Airbnb listings, combining extensive feature engineering with stacking and voting ensemble methods to deliver competitive pricing insights.
@@ -9,11 +9,12 @@
 
 Airbnb hosts in Melbourne often struggle to set optimal prices, with the platform's own suggestions frequently undervaluing listings. This project builds a data-driven pricing engine using structured listing data, engineered geospatial and textual features, and an ensemble of tuned regression models to predict listing prices with high accuracy.
 
-**Key questions explored:**
-- What property attributes most strongly predict Airbnb listing price?
-- How does geographic proximity to Melbourne's CBD affect pricing?
-- Can ensemble methods outperform individual regression models?
-- Does log-transforming the target variable improve model performance?
+## 💡 Stakeholders & Benefits
+Accurate price predictions offer immense value across multiple verticals:
+- **Hosts:** Helps set competitive yet profitable rates, bypassing Airbnb’s often low suggested pricing algorithms.
+- **Airbnb Guests:** Provides insights allowing guests to assess whether a listing is fairly priced based on its features, location, and market trends.
+- **Property Investors:** Supports data-backed decisions regarding location selection, property attributes, and overall investment assessment.
+- **Financial Institutions:** Banks and insurers can leverage these price predictions when assessing loan applications or determining risk factors.
 
 ---
 
